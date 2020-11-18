@@ -4,21 +4,21 @@ PREFIX ?= /usr
 BINDIR ?= $(PREFIX)/bin
 CC     ?= gcc
 
-all: sowm
+all: dinowm
 
 config.h:
 	cp config.def.h config.h
 
-sowm: sowm.c sowm.h config.h Makefile
+dinowm: dinowm.c dinowm.h config.h Makefile
 	$(CC) -O3 $(CFLAGS) -o $@ $< -lX11 $(LDFLAGS)
 
 install: all
-	install -Dm755 sowm $(DESTDIR)$(BINDIR)/sowm
+	install -Dm755 dinowm $(DESTDIR)$(BINDIR)/dinowm
 
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/sowm
+	rm -f $(DESTDIR)$(BINDIR)/dinowm
 
 clean:
-	rm -f sowm *.o
+	rm -f dinowm *.o
 
 .PHONY: all install uninstall clean

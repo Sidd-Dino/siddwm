@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdio.h>
 
-#include "sowm.h"
+#include "dinowm.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
@@ -124,6 +125,23 @@ void win_del(Window w) {
 
 void win_kill(const Arg arg) {
     if (cur) XKillClient(d, cur->w);
+}
+
+void win_w_resize(const Arg arg) {
+    if (!cur) return;
+
+    ww=MAX(ww+arg.i , MIN_WINDOW_SIZE);
+
+    XResizeWindow(d, cur->w, ww, wh );
+
+}
+
+void win_h_resize(const Arg arg) {
+    if (!cur) return;
+
+    wh=MAX(wh+arg.i , MIN_WINDOW_SIZE );
+    
+    XResizeWindow(d, cur->w, ww, wh );
 }
 
 void win_center(const Arg arg) {
