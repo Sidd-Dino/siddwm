@@ -1,18 +1,20 @@
 # siddwm (Siddwm Is Dumb Dumb Window Manager )
 
 A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. That's all
-
+<a href="https://i.imgur.com/CboBvUG.png"><img src="https://i.imgur.com/CboBvUG.png" width="43%" align="right"></a>
 - Floating only.
 - Fullscreen toggle.
 - Window centering.
 - Mix of mouse and keyboard workflow.
 - Focus with cursor .
 - Alt-Tab window focusing.
-- All windows die on exit.
+- All windows die on exit.<a href="https://i.imgur.com/0GBzAZq.png"><img src="https://i.imgur.com/0GBzAZq.png" width="44.5%" align="right"></a>
 - No window borders.
 - [No ICCCM](https://web.archive.org/web/20190617214524/https://raw.githubusercontent.com/kfish/xsel/1a1c5edf0dc129055f7764c666da2dd468df6016/rant.txt).
 - No EWMH.
 - etc etc etc
+
+</br></br>
 
 ## Default Keybindings
 
@@ -37,7 +39,7 @@ A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. T
 | combo                    | action           | program        |
 | ------------------------ | ---------------- | -------------- |
 | `MOD4` + `Return`        | terminal         | `kitty`        |
-| `MOD4` + `d`             | dmenu            | `rofi`         |
+| `MOD4` + `d`             | dmenu            | `rofi`          |
 | `MOD4` + `p`             | scrot            | `scrot`        |
 | `MOD4` + `w`             | wallpaper cycler | `wllppr`       |
 | `XF86_AudioLowerVolume`  | volume down      | `amixer`       |
