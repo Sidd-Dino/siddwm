@@ -1,6 +1,6 @@
 # dinowm (Dino's Window Manager*)
 
-A fork of [sowm](https://github.com/dylanaraps/sowm) just with an added keybinding. That's all
+A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. That's all
 
 - Floating only.
 - Fullscreen toggle.
