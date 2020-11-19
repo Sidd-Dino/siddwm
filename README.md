@@ -1,4 +1,4 @@
-# dinowm (Dino's Window Manager*)
+# siddwm (Siddwm Is Dumb Dumb Window Manager )
 
 A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. That's all
 
@@ -38,13 +38,13 @@ A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. T
 | ------------------------ | ---------------- | -------------- |
 | `MOD4` + `Return`        | terminal         | `kitty`        |
 | `MOD4` + `d`             | dmenu            | `rofi`         |
-| `MOD4` + `p`             | scrot            | `i3-scrot`     |
+| `MOD4` + `p`             | scrot            | `scrot`        |
 | `MOD4` + `w`             | wallpaper cycler | `wllppr`       |
 | `XF86_AudioLowerVolume`  | volume down      | `amixer`       |
 | `XF86_AudioRaiseVolume`  | volume up        | `amixer`       |
 | `XF86_AudioMute`         | volume toggle    | `amixer`       |
-| `XF86_MonBrightnessUp`   | brightness up    | `bri`          |
-| `XF86_MonBrightnessDown` | brightness down  | `bri`          |
+| `XF86_MonBrightnessUp`   | brightness up    | `xbacklight`   |
+| `XF86_MonBrightnessDown` | brightness down  | `xbacklight`   |
 
 
 ## Dependencies
@@ -55,20 +55,20 @@ A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. T
 ## Installation
 
 1) Copy `config.def.h` to `config.h` and modify it to suit your needs.
-2) Run `make` to build `dinowm`.
+2) Run `make` to build `siddwm`.
 3) Copy it to your path or run `make install`.
     - `DESTDIR` and `PREFIX` are supported.
 4) (Optional) Apply patch with `git apply patches/patch-name`
     - In case of applying multiple patches, it has to be done **manually**.
 
-If you are using GDM, save the following to `/usr/share/xsessions/dinowm.desktop`. It is still recommended to start `sowm` from `.xinitrc` or through
+If you are using GDM, save the following to `/usr/share/xsessions/siddwm.desktop`. It is still recommended to start `siddwm` from `.xinitrc` or through
 [your own xinit implementation](https://github.com/dylanaraps/bin/blob/dfd9a9ff4555efb1cc966f8473339f37d13698ba/x).
 
 ```
 [Desktop Entry]
-Name=dinowm
-Comment=This session runs sowm as desktop manager
-Exec=dinowm
+Name=siddwm
+Comment=This session runs siddwm as desktop manager
+Exec=siddwm
 Type=Application
 ```
 

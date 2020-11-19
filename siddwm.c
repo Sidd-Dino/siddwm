@@ -1,4 +1,4 @@
-// sowm - An itsy bitsy floating window manager.
+// siddwm - siddwm is dumb dumb wm
 
 #include <X11/Xlib.h>
 #include <X11/XF86keysym.h>
@@ -7,9 +7,8 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include <stdio.h>
 
-#include "dinowm.h"
+#include "siddwm.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
@@ -140,7 +139,7 @@ void win_h_resize(const Arg arg) {
     if (!cur) return;
 
     wh=MAX(wh+arg.i , MIN_WINDOW_SIZE );
-    
+
     XResizeWindow(d, cur->w, ww, wh );
 }
 
