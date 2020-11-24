@@ -43,10 +43,10 @@ void motionnotify(xcb_generic_event_t *);
 void go_to_ws();
 void mv_to_ws();
 
-int setup_keyboard();
-int setup();
-
-void run(const Arg arg);
 void cleanup();
+void run(const Arg *arg);
+
+xcb_keycode_t* xcb_get_keycodes(xcb_keysym_t keysym);
+int grab_input(void);
 
 static int xerror() { return 0; }

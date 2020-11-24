@@ -5,8 +5,10 @@
 #define CONTROL         XCB_MOD_MASK_CONTROL /* Control key */
 #define SHIFT           XCB_MOD_MASK_SHIFT   /* Shift key */
 
-const unsigned int MIN_WINDOW_SIZE    = 100;
-const unsigned int WINDOW_RESIZE_DIFF = 5;
+const unsigned int WORKSPACES = 10;
+
+//const unsigned int MIN_WINDOW_SIZE    = 100;
+//const unsigned int WINDOW_RESIZE_DIFF = 5;
 
 const char* menu[]    	= {"rofi", "-show", "drun",	0};
 const char* term[]    	= {"kitty",			0};
