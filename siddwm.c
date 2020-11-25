@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "siddwm.h"
+#include "config.def.h"
 
 static client *list = {0}, *ws_list[WORKSPACES], *cur;
 static xcb_connection_t *dpy;
@@ -25,8 +26,6 @@ static void (*events[XCB_NO_OPERATION])(xcb_generic_event_t *e)  = {
         [XCB_ENTER_NOTIFY]        = enternotify,
         [XCB_MOTION_NOTIFY]       = motionnotify,
 };
-
-#include "config.def.h"
 
 void
 cleanup(){
@@ -126,7 +125,7 @@ grab_input(void){
 
         for (i=0; i<LENGTH(keys); i++) {
                 keycode = xcb_get_keycodes(keys[i].keysym);
-                for (j=0; keycode[k] != XCB_NO_SYMBOL; j++)
+                for (j=0; keycode[j] != XCB_NO_SYMBOL; j++)
 			for (n=0; n<LENGTH(modifiers); n++)
 				xcb_grab_key(dpy, 1, root, keys[i].mod
 					| modifiers[n], keycode[j],
@@ -143,7 +142,7 @@ grab_input(void){
                                 XCB_EVENT_MASK_BUTTON_RELEASE|
                                 XCB_EVENT_MASK_POINTER_MOTION,
                                 XCB_GRAB_MODE_ASYNC,XCB_GRAB_MODE_ASYNC,
-                                XCB_NONE, XCB_NONE, , MOD|modifiers[j])
+                                XCB_NONE, XCB_NONE, i , MOD|modifiers[j]);
 }
 
 int
