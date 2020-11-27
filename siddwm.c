@@ -29,8 +29,7 @@
  root    : root screen
 */
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
-static int          ws = 1, sw, sh, wx, wy, numlock = 0;
-static unsigned int ww, wh;
+static int          ws = 1, sw, sh, numlock = 0;
 
 static Display      *d;
 static XButtonEvent mouse;
@@ -58,7 +57,7 @@ static void (*events[LASTEvent])(XEvent *e) = {
 void button_press(XEvent *e) {
     if (!e->xbutton.subwindow) return;
 
-    win_size(e->xbutton.subwindow, &wx, &wy, &ww, &wh);
+    win_size(e->xbutton.subwindow, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
     XRaiseWindow(d, e->xbutton.subwindow);
     mouse = e->xbutton;
 }
@@ -93,11 +92,11 @@ void map_request(XEvent *e) {
     Window w = e->xmaprequest.window;
 
     XSelectInput(d, w, StructureNotifyMask|EnterWindowMask);
-    win_size(w, &wx, &wy, &ww, &wh);
     win_add(w);
     cur = list->prev;
+    win_size(w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
 
-    if (wx + wy == 0) win_center((Arg){0});
+    if (cur->wx + cur->wy == 0) win_center((Arg){0});
 
     XMapWindow(d, w);
     win_focus(list->prev);
@@ -115,7 +114,7 @@ void mapping_notify(XEvent *e) {
 }
 
 void notify_destroy(XEvent *e) {
-    win_del(e->xdestroywindow.window);
+    win_del(e->xdestroywindow.window , 1 );
 
     if (list) win_focus(list->prev);
 }
@@ -138,10 +137,10 @@ void notify_motion(XEvent *e) {
     int yd = e->xbutton.y_root - mouse.y_root;
 
     XMoveResizeWindow(d, mouse.subwindow,
-        wx + (mouse.button == 1 ? xd : 0),
-        wy + (mouse.button == 1 ? yd : 0),
-        MAX(1, ww + (mouse.button == 3 ? xd : 0)),
-        MAX(1, wh + (mouse.button == 3 ? yd : 0)));
+        cur->wx + (mouse.button == 1 ? xd : 0),
+        cur->wy + (mouse.button == 1 ? yd : 0),
+        MAX(1, cur->ww + (mouse.button == 3 ? xd : 0)),
+        MAX(1, cur->wh + (mouse.button == 3 ? yd : 0)));
 }
 
 
@@ -170,17 +169,20 @@ void win_add(Window w) {
 void win_center(const Arg arg) {
     if (!cur) return;
 
-    win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
-    XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+    win_size(cur->w, &(int){0}, &(int){0}, &cur->ww, &cur->wh);
+    XMoveWindow(d, cur->w, (sw - cur->ww) / 2, (sh - cur->wh) / 2);
 }
 
-void win_del(Window w) {
+void win_del(Window w , int null_flag) {
     client *x = 0;
 
     for win if (c->w == w) x = c;
 
     if (!list || !x)  return;
-    if (x->prev == x){ list = 0; cur = 0;}
+    if (x->prev == x){
+        list = 0;
+        cur = null_flag ? 0 : cur;
+    }
     if (list == x)    list = x->next;
     if (x->next)      x->next->prev = x->prev;
     if (x->prev)      x->prev->next = x->next;
@@ -227,17 +229,17 @@ void win_prev(const Arg arg) {
 void win_resize_h(const Arg arg) {
     if (!cur) return;
 
-    wh=MAX(wh+arg.i , MIN_WINDOW_SIZE );
+    cur->wh=MAX(cur->wh+arg.i , MIN_WINDOW_SIZE );
 
-    XResizeWindow(d, cur->w, ww, wh );
+    XResizeWindow(d, cur->w, cur->ww, cur->wh );
 }
 
 void win_resize_w(const Arg arg) {
     if (!cur) return;
 
-    ww=MAX(ww+arg.i , MIN_WINDOW_SIZE);
+    cur->ww=MAX(cur->ww+arg.i , MIN_WINDOW_SIZE);
 
-    XResizeWindow(d, cur->w, ww, wh );
+    XResizeWindow(d, cur->w, cur->ww, cur->wh );
 
 }
 
@@ -271,7 +273,7 @@ void win_to_ws(const Arg arg) {
     ws_save(arg.i);
 
     ws_sel(tmp);
-    win_del(cur->w);
+    win_del(cur->w , 0);
     XUnmapWindow(d, cur->w);
     ws_save(tmp);
 
