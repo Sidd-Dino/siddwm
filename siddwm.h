@@ -36,25 +36,28 @@ typedef struct client {
 void button_press(XEvent *e);
 void button_release(XEvent *e);
 void configure_request(XEvent *e);
-void input_grab(Window root);
 void key_press(XEvent *e);
 void map_request(XEvent *e);
 void mapping_notify(XEvent *e);
 void notify_destroy(XEvent *e);
 void notify_enter(XEvent *e);
 void notify_motion(XEvent *e);
-void run(const Arg arg);
+
 void win_add(Window w);
 void win_center(const Arg arg);
 void win_del(Window w);
-void win_fs(const Arg arg);
 void win_focus(client *c);
+void win_fs(const Arg arg);
 void win_kill(const Arg arg);
-void win_prev(const Arg arg);
 void win_next(const Arg arg);
-void win_to_ws(const Arg arg);
+void win_prev(const Arg arg);
+void win_resize_h(const Arg arg);
+void win_resize_w(const Arg arg);
+
 void ws_go(const Arg arg);
-void win_h_resize(const Arg arg);
-void win_w_resize(const Arg arg);
+void win_to_ws(const Arg arg);
+
+void run(const Arg arg);
+void input_grab(Window root);
 
 static int xerror() { return 0; }

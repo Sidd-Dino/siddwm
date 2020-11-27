@@ -1,4 +1,5 @@
 // siddwm - siddwm is dumb dumb wm
+// refer [https://tronche.com/gui/x/xlib/] for basic explanations
 
 #include <X11/Xlib.h>
 #include <X11/XF86keysym.h>
@@ -10,6 +11,23 @@
 
 #include "siddwm.h"
 
+/* Globals
+ list    : list of windows of current workspace
+           (dynamic array of clients)
+ ws_list : list of workspaces (array of pointers) (array of clients)
+ cur     : current window in focus
+ ws      : current workspace
+ sw , sh : screen width and height
+ wx , wy : top left corner of the current window
+ numlock : Numlock mask used in input_grab()
+ ww , wh : window width and height
+
+ d       : connection to X-server
+ mouse   : Read this link
+           [https://tronche.com/gui/x/xlib/events/keyboard-pointer/
+            keyboard-pointer.html#XButtonEvent]
+ root    : root screen
+*/
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
@@ -18,23 +36,82 @@ static Display      *d;
 static XButtonEvent mouse;
 static Window       root;
 
+/* General Info
+  XEvent union info : https://tronche.com/gui/x/xlib/events/structures.html
+*/
+
+// Array of fucntion pointer of Xevents to custom fucntions
 static void (*events[LASTEvent])(XEvent *e) = {
     [ButtonPress]      = button_press,
     [ButtonRelease]    = button_release,
-    [ConfigureRequest] = configure_request,
-    [KeyPress]         = key_press,
-    [MapRequest]       = map_request,
-    [MappingNotify]    = mapping_notify,
-    [DestroyNotify]    = notify_destroy,
-    [EnterNotify]      = notify_enter,
-    [MotionNotify]     = notify_motion
+    [ConfigureRequest] = configure_request,  //
+    [KeyPress]         = key_press,          // keyboard key press event
+    [MapRequest]       = map_request,        // map window request
+    [MappingNotify]    = mapping_notify,     //
+    [DestroyNotify]    = notify_destroy,     //
+    [EnterNotify]      = notify_enter,       //
+    [MotionNotify]     = notify_motion       // cursor motion
 };
 
 #include "config.h"
 
-void win_focus(client *c) {
-    cur = c;
-    XSetInputFocus(d, cur->w, RevertToParent, CurrentTime);
+void button_press(XEvent *e) {
+    if (!e->xbutton.subwindow) return;
+
+    win_size(e->xbutton.subwindow, &wx, &wy, &ww, &wh);
+    XRaiseWindow(d, e->xbutton.subwindow);
+    mouse = e->xbutton;
+}
+
+void button_release(XEvent *e) {
+    mouse.subwindow = 0;
+}
+
+void configure_request(XEvent *e) {
+    XConfigureRequestEvent *ev = &e->xconfigurerequest;
+
+    XConfigureWindow(d, ev->window, ev->value_mask, &(XWindowChanges) {
+        .x          = ev->x,
+        .y          = ev->y,
+        .width      = ev->width,
+        .height     = ev->height,
+        .sibling    = ev->above,
+        .stack_mode = ev->detail
+    });
+}
+
+void key_press(XEvent *e) {
+    KeySym keysym = XkbKeycodeToKeysym(d, e->xkey.keycode, 0, 0);
+
+    for (unsigned int i=0; i < sizeof(keys)/sizeof(*keys); ++i)
+        if (keys[i].keysym == keysym &&
+            mod_clean(keys[i].mod) == mod_clean(e->xkey.state))
+            keys[i].function(keys[i].arg);
+}
+
+void map_request(XEvent *e) {
+    Window w = e->xmaprequest.window;
+
+    XSelectInput(d, w, StructureNotifyMask|EnterWindowMask);
+    win_size(w, &wx, &wy, &ww, &wh);
+    win_add(w);
+    cur = list->prev;
+
+    if (wx + wy == 0) win_center((Arg){0});
+
+    XMapWindow(d, w);
+    win_focus(list->prev);
+}
+
+void mapping_notify(XEvent *e) {
+    // rtfm
+    // (https://tronche.com/gui/x/xlib/events/window-state-change/mapping.html)
+    XMappingEvent *ev = &e->xmapping;
+
+    if (ev->request == MappingKeyboard || ev->request == MappingModifier) {
+        XRefreshKeyboardMapping(ev);
+        input_grab(root);
+    }
 }
 
 void notify_destroy(XEvent *e) {
@@ -44,6 +121,9 @@ void notify_destroy(XEvent *e) {
 }
 
 void notify_enter(XEvent *e) {
+    // XCheckTypedEvent searches for EnterNotify event in the event queue and
+    // returns that event as e
+    // rtfm (https://tronche.com/gui/x/xlib/events/window-entry-exit/)
     while(XCheckTypedEvent(d, EnterNotify, e));
 
     for win if (c->w == e->xcrossing.window) win_focus(c);
@@ -64,26 +144,6 @@ void notify_motion(XEvent *e) {
         MAX(1, wh + (mouse.button == 3 ? yd : 0)));
 }
 
-void key_press(XEvent *e) {
-    KeySym keysym = XkbKeycodeToKeysym(d, e->xkey.keycode, 0, 0);
-
-    for (unsigned int i=0; i < sizeof(keys)/sizeof(*keys); ++i)
-        if (keys[i].keysym == keysym &&
-            mod_clean(keys[i].mod) == mod_clean(e->xkey.state))
-            keys[i].function(keys[i].arg);
-}
-
-void button_press(XEvent *e) {
-    if (!e->xbutton.subwindow) return;
-
-    win_size(e->xbutton.subwindow, &wx, &wy, &ww, &wh);
-    XRaiseWindow(d, e->xbutton.subwindow);
-    mouse = e->xbutton;
-}
-
-void button_release(XEvent *e) {
-    mouse.subwindow = 0;
-}
 
 void win_add(Window w) {
     client *c;
@@ -107,13 +167,20 @@ void win_add(Window w) {
     ws_save(ws);
 }
 
+void win_center(const Arg arg) {
+    if (!cur) return;
+
+    win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
+    XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+}
+
 void win_del(Window w) {
     client *x = 0;
 
     for win if (c->w == w) x = c;
 
     if (!list || !x)  return;
-    if (x->prev == x) list = 0;
+    if (x->prev == x){ list = 0; cur = 0;}
     if (list == x)    list = x->next;
     if (x->next)      x->next->prev = x->prev;
     if (x->prev)      x->prev->next = x->next;
@@ -122,32 +189,9 @@ void win_del(Window w) {
     ws_save(ws);
 }
 
-void win_kill(const Arg arg) {
-    if (cur) XKillClient(d, cur->w);
-}
-
-void win_w_resize(const Arg arg) {
-    if (!cur) return;
-
-    ww=MAX(ww+arg.i , MIN_WINDOW_SIZE);
-
-    XResizeWindow(d, cur->w, ww, wh );
-
-}
-
-void win_h_resize(const Arg arg) {
-    if (!cur) return;
-
-    wh=MAX(wh+arg.i , MIN_WINDOW_SIZE );
-
-    XResizeWindow(d, cur->w, ww, wh );
-}
-
-void win_center(const Arg arg) {
-    if (!cur) return;
-
-    win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
-    XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+void win_focus(client *c) {
+    cur = c;
+    XSetInputFocus(d, cur->w, RevertToParent, CurrentTime);
 }
 
 void win_fs(const Arg arg) {
@@ -162,28 +206,8 @@ void win_fs(const Arg arg) {
     }
 }
 
-void win_to_ws(const Arg arg) {
-    int tmp = ws;
-
-    if (arg.i == tmp) return;
-
-    ws_sel(arg.i);
-    win_add(cur->w);
-    ws_save(arg.i);
-
-    ws_sel(tmp);
-    win_del(cur->w);
-    XUnmapWindow(d, cur->w);
-    ws_save(tmp);
-
-    if (list) win_focus(list);
-}
-
-void win_prev(const Arg arg) {
-    if (!cur) return;
-
-    XRaiseWindow(d, cur->prev->w);
-    win_focus(cur->prev);
+void win_kill(const Arg arg) {
+    if (cur) XKillClient(d, cur->w);
 }
 
 void win_next(const Arg arg) {
@@ -192,6 +216,31 @@ void win_next(const Arg arg) {
     XRaiseWindow(d, cur->next->w);
     win_focus(cur->next);
 }
+
+void win_prev(const Arg arg) {
+        if (!cur) return;
+
+        XRaiseWindow(d, cur->prev->w);
+        win_focus(cur->prev);
+}
+
+void win_resize_h(const Arg arg) {
+    if (!cur) return;
+
+    wh=MAX(wh+arg.i , MIN_WINDOW_SIZE );
+
+    XResizeWindow(d, cur->w, ww, wh );
+}
+
+void win_resize_w(const Arg arg) {
+    if (!cur) return;
+
+    ww=MAX(ww+arg.i , MIN_WINDOW_SIZE);
+
+    XResizeWindow(d, cur->w, ww, wh );
+
+}
+
 
 void ws_go(const Arg arg) {
     int tmp = ws;
@@ -212,44 +261,28 @@ void ws_go(const Arg arg) {
     if (list) win_focus(list); else cur = 0;
 }
 
-void configure_request(XEvent *e) {
-    XConfigureRequestEvent *ev = &e->xconfigurerequest;
+void win_to_ws(const Arg arg) {
+    int tmp = ws;
 
-    XConfigureWindow(d, ev->window, ev->value_mask, &(XWindowChanges) {
-        .x          = ev->x,
-        .y          = ev->y,
-        .width      = ev->width,
-        .height     = ev->height,
-        .sibling    = ev->above,
-        .stack_mode = ev->detail
-    });
+    if (arg.i == tmp) return;
+
+    ws_sel(arg.i);
+    win_add(cur->w);
+    ws_save(arg.i);
+
+    ws_sel(tmp);
+    win_del(cur->w);
+    XUnmapWindow(d, cur->w);
+    ws_save(tmp);
+
+    if (list) win_focus(list);
 }
 
-void map_request(XEvent *e) {
-    Window w = e->xmaprequest.window;
-
-    XSelectInput(d, w, StructureNotifyMask|EnterWindowMask);
-    win_size(w, &wx, &wy, &ww, &wh);
-    win_add(w);
-    cur = list->prev;
-
-    if (wx + wy == 0) win_center((Arg){0});
-
-    XMapWindow(d, w);
-    win_focus(list->prev);
-}
-
-void mapping_notify(XEvent *e) {
-    XMappingEvent *ev = &e->xmapping;
-
-    if (ev->request == MappingKeyboard || ev->request == MappingModifier) {
-        XRefreshKeyboardMapping(ev);
-        input_grab(root);
-    }
-}
 
 void run(const Arg arg) {
     if (fork()) return;
+
+    // if connection to X is ??? , end connection
     if (d) close(ConnectionNumber(d));
 
     setsid();
@@ -284,23 +317,39 @@ void input_grab(Window root) {
     XFreeModifiermap(modmap);
 }
 
+
 int main(void) {
     XEvent ev;
 
+    // open new conenction with Xserver
     if (!(d = XOpenDisplay(0))) exit(1);
 
+    // Ignore SIGCHILD
     signal(SIGCHLD, SIG_IGN);
+
+    /*
+        execute xerror on encountering error
+        Read link for more info
+        [ https://linux.die.net/man/3/xseterrorhandler ]
+    */
     XSetErrorHandler(xerror);
 
+    // Default screen ges the current screen
     int s = DefaultScreen(d);
     root  = RootWindow(d, s);
     sw    = XDisplayWidth(d, s);
     sh    = XDisplayHeight(d, s);
 
+    // rtfm
+    // [https://linux.die.net/man/3/xselectinput]
     XSelectInput(d,  root, SubstructureRedirectMask);
+
+    // rtfm
+    // [https://www.x.org/releases/X11R7.5/doc/man/man3/XDefineCursor.3.html]
     XDefineCursor(d, root, XCreateFontCursor(d, 68));
     input_grab(root);
 
+    // main loop
     while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
         if (events[ev.type]) events[ev.type](&ev);
 }
