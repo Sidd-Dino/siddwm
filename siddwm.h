@@ -45,7 +45,7 @@ void notify_motion(XEvent *e);
 
 void win_add(Window w);
 void win_center(const Arg arg);
-void win_del(Window w , int null_flag);
+void win_del(Window w , int del_cur);
 void win_focus(client *c);
 void win_fs(const Arg arg);
 void win_kill(const Arg arg);

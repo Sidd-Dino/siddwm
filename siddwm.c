@@ -43,13 +43,13 @@ static Window       root;
 static void (*events[LASTEvent])(XEvent *e) = {
     [ButtonPress]      = button_press,
     [ButtonRelease]    = button_release,
-    [ConfigureRequest] = configure_request,  //
-    [KeyPress]         = key_press,          // keyboard key press event
-    [MapRequest]       = map_request,        // map window request
-    [MappingNotify]    = mapping_notify,     //
-    [DestroyNotify]    = notify_destroy,     //
-    [EnterNotify]      = notify_enter,       //
-    [MotionNotify]     = notify_motion       // cursor motion
+    [ConfigureRequest] = configure_request,
+    [KeyPress]         = key_press,
+    [MapRequest]       = map_request,
+    [MappingNotify]    = mapping_notify,
+    [DestroyNotify]    = notify_destroy,
+    [EnterNotify]      = notify_enter,
+    [MotionNotify]     = notify_motion,
 };
 
 #include "config.h"
@@ -143,7 +143,8 @@ void notify_motion(XEvent *e) {
         MAX(1, cur->wh + (mouse.button == 3 ? yd : 0)));
 }
 
-
+// The data structure used by sowm and siddwm is a
+// circular linked list.
 void win_add(Window w) {
     client *c;
 
@@ -157,7 +158,6 @@ void win_add(Window w) {
         c->prev          = list->prev;
         list->prev       = c;
         c->next          = list;
-
     } else {
         list = c;
         list->prev = list->next = list;
@@ -173,7 +173,9 @@ void win_center(const Arg arg) {
     XMoveWindow(d, cur->w, (sw - cur->ww) / 2, (sh - cur->wh) / 2);
 }
 
-void win_del(Window w , int null_flag) {
+void win_del(Window w , int del_cur) {
+    // del_cur is used if win_del is called by notify_destroy
+    // to empty cur else it shouldnt empty cur
     client *x = 0;
 
     for win if (c->w == w) x = c;
@@ -181,7 +183,7 @@ void win_del(Window w , int null_flag) {
     if (!list || !x)  return;
     if (x->prev == x){
         list = 0;
-        cur = null_flag ? 0 : cur;
+        cur = del_cur ? 0 : cur;
     }
     if (list == x)    list = x->next;
     if (x->next)      x->next->prev = x->prev;
