@@ -26,13 +26,14 @@ const char* wallpaper[] = {"wllppr",                                    0};
 
 static struct key keys[] = {
     {MOD,      XK_q,   win_kill,   {0}},
-    //{MOD,      XK_c,   win_center, {0}},
-    //{MOD,      XK_f,   win_fs,     {0}},
+    {MOD,      XK_c,   win_center, {0}},
+    {MOD,      XK_f,   win_fs,     {0}},
 
     {XCB_MOD_MASK_1,       XK_Tab, win_next,   {0}},
     {XCB_MOD_MASK_1|SHIFT, XK_Tab, win_prev,   {0}},
 
     {MOD,       XK_Return, 	run, {.com = term}},
+
     {MOD,       XK_d,      	run, {.com = menu}},
     {MOD,       XK_w,      	run, {.com = brwsr}},
 
@@ -43,18 +44,10 @@ static struct key keys[] = {
     {MOD,       XK_s,		run, {.com = status}},
     {MOD|SHIFT, XK_w,		run, {.com = wallpaper}},
 
-    {0,   XF86XK_AudioLowerVolume,  run, {.com = voldown}},
-    {0,   XF86XK_AudioRaiseVolume,  run, {.com = volup}},
-    {0,   XF86XK_AudioMute,         run, {.com = volmute}},
-    {0,   XF86XK_MonBrightnessUp,   run, {.com = briup}},
-    {0,   XF86XK_MonBrightnessDown, run, {.com = bridown}},
-
-    /*
     {MOD|SHIFT, XK_Left , win_resize_w, {.i = -WINDOW_RESIZE_DIFF}},
     {MOD|SHIFT, XK_Right, win_resize_w, {.i = WINDOW_RESIZE_DIFF}},
     {MOD|SHIFT, XK_Up   , win_resize_h, {.i = -WINDOW_RESIZE_DIFF}},
     {MOD|SHIFT, XK_Down , win_resize_h, {.i = WINDOW_RESIZE_DIFF}},
-    */
 
     {MOD,               XK_1, go_to_ws, {.i = 1}},
     {MOD|SHIFT,         XK_1, mv_to_ws, {.i = 1}},
@@ -76,6 +69,7 @@ static struct key keys[] = {
     {MOD|SHIFT,         XK_9, mv_to_ws, {.i = 9}},
     {MOD,               XK_0, go_to_ws, {.i = 0}},
     {MOD|SHIFT,         XK_0, mv_to_ws, {.i = 0}},
+
 };
 
 #endif
