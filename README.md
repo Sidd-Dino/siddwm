@@ -17,11 +17,11 @@
 </br>
 
 <h3 align="center">thanks to</h3>
-<center>
-<a href="https://github.com/dylanaraps/sowm">sowm</a>
-<a href="https://github.com/Cloudef/monsterwm-xcb">monsterwm-xcb</a>
-<a href="https://github.com/venam/2bwm">2bwm</a>
-<a href="https://github.com/dcat/swm">swm</a>
-<a href="https://github.com/JLErvin/berry">berry</a>
+<p align="center">
+<a href="https://github.com/dylanaraps/sowm">sowm</a></br>
+<a href="https://github.com/Cloudef/monsterwm-xcb">monsterwm-xcb</a></br>
+<a href="https://github.com/venam/2bwm">2bwm</a></br>
+<a href="https://github.com/dcat/swm">swm</a></br>
+<a href="https://github.com/JLErvin/berry">berry</a></br>
 <a href="https://github.com/rtyler/tinywm-ada">tinywm-xcb</a>
-</center>
+</p>
