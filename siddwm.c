@@ -54,6 +54,9 @@ static void (*events[LASTEvent])(XEvent *e) = {
 
 #include "config.h"
 
+/* on the press of a button check to see if there's a binded
+ *function to call
+ */
 void button_press(XEvent *e) {
     if (!e->xbutton.subwindow) return;
 
@@ -62,10 +65,16 @@ void button_press(XEvent *e) {
     mouse = e->xbutton;
 }
 
+/* on the release of a button check to see if there's a binded
+ * function to call
+ */
 void button_release(XEvent *e) {
     mouse.subwindow = 0;
 }
 
+/* a configure request means that the window requested changes in its geometry
+ * state.
+ */
 void configure_request(XEvent *e) {
     XConfigureRequestEvent *ev = &e->xconfigurerequest;
 
@@ -79,6 +88,7 @@ void configure_request(XEvent *e) {
     });
 }
 
+/* on the press of a key check to see if there's a binded function to call */
 void key_press(XEvent *e) {
     KeySym keysym = XkbKeycodeToKeysym(d, e->xkey.keycode, 0, 0);
 
@@ -88,6 +98,7 @@ void key_press(XEvent *e) {
             keys[i].function(keys[i].arg);
 }
 
+/* a map request is received when a window wants to display itself */
 void map_request(XEvent *e) {
     Window w = e->xmaprequest.window;
 
@@ -102,9 +113,11 @@ void map_request(XEvent *e) {
     win_focus(list->prev);
 }
 
+/* ??? WTF is this for
+ * I guess this explains it?
+ * https://tronche.com/gui/x/xlib/events/window-state-change/mapping.html
+ */
 void mapping_notify(XEvent *e) {
-    // rtfm
-    // (https://tronche.com/gui/x/xlib/events/window-state-change/mapping.html)
     XMappingEvent *ev = &e->xmapping;
 
     if (ev->request == MappingKeyboard || ev->request == MappingModifier) {
@@ -113,12 +126,16 @@ void mapping_notify(XEvent *e) {
     }
 }
 
+/* a destroy notification is received when a window is being closed
+ * on receival, remove the appropriate client that held that window
+ */
 void notify_destroy(XEvent *e) {
     win_del(e->xdestroywindow.window , 1 );
 
     if (list) win_focus(list->prev);
 }
 
+/* when the mouse hovers over a window focus on that window */
 void notify_enter(XEvent *e) {
     // XCheckTypedEvent searches for EnterNotify event in the event queue and
     // returns that event as e
@@ -128,6 +145,7 @@ void notify_enter(XEvent *e) {
     for win if (c->w == e->xcrossing.window) win_focus(c);
 }
 
+/* if the mouse moves while over a window, execute code */
 void notify_motion(XEvent *e) {
     if (!mouse.subwindow || cur->f) return;
 
@@ -143,8 +161,10 @@ void notify_motion(XEvent *e) {
         MAX(1, cur->wh + (mouse.button == 3 ? yd : 0)));
 }
 
-// The data structure used by sowm and siddwm is a
-// circular linked list.
+
+/* The data structure used by sowm and siddwm is a
+ * circular linked list.
+ */
 void win_add(Window w) {
     client *c;
 
