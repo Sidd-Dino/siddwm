@@ -286,6 +286,8 @@ void ws_go(const Arg arg) {
 }
 
 void win_to_ws(const Arg arg) {
+    if(!cur) return;
+
     int tmp = ws;
 
     if (arg.i == tmp) return;
