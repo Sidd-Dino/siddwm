@@ -1,11 +1,13 @@
 <p align="center"><img src="https://i.imgur.com/4lUJZEa.png"></p>
 
+
+<p align="center">
 <a href="https://github.com/Sidd-Dino/siddwm/tree/xcb_ver">
-    <img src="https://i.imgur.com/2PTNAeo.png" height="50px" align="left"></a>
+    <img src="https://i.imgur.com/2PTNAeo.png" height="50px" align="center"></a>
+
 <a href="https://github.com/Sidd-Dino/siddwm/tree/xlib_ver">
-    <img src="https://i.imgur.com/RyscKM1.png" height="50px" align="right"></a>
-</br>
-</br></br>
+    <img src="https://i.imgur.com/RyscKM1.png" height="50px" align="center"></a>
+</br></br></br>
 
 
 <p align="center">
