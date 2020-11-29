@@ -22,15 +22,15 @@ typedef struct client {
         xcb_window_t w;
 } client;
 
-void buttonpress(xcb_generic_event_t *);
-void buttonrelease(xcb_generic_event_t *);
-void configurerequest(xcb_generic_event_t *);
-void keypress(xcb_generic_event_t *);
-void maprequest(xcb_generic_event_t *);
-void mapnotify(xcb_generic_event_t *);
-void destroynotify(xcb_generic_event_t *);
-void enternotify(xcb_generic_event_t *);
-void motionnotify(xcb_generic_event_t *);
+void buttonpress(xcb_generic_event_t *e);
+void buttonrelease(xcb_generic_event_t *e);
+void configurerequest(xcb_generic_event_t *e);
+void keypress(xcb_generic_event_t *e);
+void maprequest(xcb_generic_event_t *e);
+void mapnotify(xcb_generic_event_t *e);
+void destroynotify(xcb_generic_event_t *e);
+void enternotify(xcb_generic_event_t *e);
+void motionnotify(xcb_generic_event_t *e);
 
 void win_add(xcb_window_t w);
 void win_center(const Arg arg);
@@ -49,7 +49,7 @@ void win_to_ws(const Arg arg);
 void run(const Arg arg);
 
 xcb_keycode_t* xcb_get_keycodes(xcb_keysym_t keysym);
-int grab_input(void);
 int setup_keyboard(void);
+int grab_input(void);
 
 static int xerror() { return 0; }
