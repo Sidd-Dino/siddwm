@@ -1,6 +1,6 @@
 # siddwm (Siddwm Is Dumb Dumb Window Manager )
 
-A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. That's all
+A fork of [sowm](https://github.com/dylanaraps/sowm) with a few fixes. That's all
 <a href="https://i.imgur.com/CboBvUG.png"><img src="https://i.imgur.com/CboBvUG.png" width="43%" align="right"></a>
 - Floating only.
 - Fullscreen toggle.
@@ -39,9 +39,10 @@ A fork of [sowm](https://github.com/dylanaraps/sowm) with an added keybinding. T
 | combo                    | action           | program        |
 | ------------------------ | ---------------- | -------------- |
 | `MOD4` + `Return`        | terminal         | `kitty`        |
-| `MOD4` + `d`             | dmenu            | `rofi`          |
+| `MOD4` + `d`             | dmenu            | `rofi`         |
 | `MOD4` + `p`             | scrot            | `scrot`        |
-| `MOD4` + `w`             | wallpaper cycler | `wllppr`       |
+| `MOD4` + `w`             | browser          | `firefox`      |
+| `MOD4` + `Shift` + `w`   | wallpaper cycler | `wllppr`       |
 | `XF86_AudioLowerVolume`  | volume down      | `amixer`       |
 | `XF86_AudioRaiseVolume`  | volume up        | `amixer`       |
 | `XF86_AudioMute`         | volume toggle    | `amixer`       |
