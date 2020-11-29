@@ -4,7 +4,10 @@
     <img src="https://i.imgur.com/2PTNAeo.png" height="50px" align="left"></a>
 <a href="https://github.com/Sidd-Dino/siddwm/tree/xlib_ver">
     <img src="https://i.imgur.com/RyscKM1.png" height="50px" align="right"></a>
+</br>
 </br></br>
+
+
 <p align="center">
 <a href="https://i.imgur.com/VpSvaV6.png">
     <img src="https://i.imgur.com/84IFWMT.png" width="75%"></a>
