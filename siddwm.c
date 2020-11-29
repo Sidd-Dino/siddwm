@@ -26,6 +26,83 @@ static void (*events[XCB_NO_OPERATION])(xcb_generic_event_t *e)  = {
         [XCB_MOTION_NOTIFY]       = motionnotify,
 };
 
+void buttonpress(xcb_generic_event_t *e){
+    return;
+}
+
+void buttonrelease(xcb_generic_event_t *e){
+    return;
+}
+
+void configurerequest(xcb_generic_event_t *e){
+    return;
+}
+
+void keypress(xcb_generic_event_t *e){
+    return;
+}
+
+void maprequest(xcb_generic_event_t *e){
+    return;
+}
+
+void mapnotify(xcb_generic_event_t *e){
+    return;
+}
+
+void destroynotify(xcb_generic_event_t *e){
+    return;
+}
+
+void enternotify(xcb_generic_event_t *e){
+    return;
+}
+
+void motionnotify(xcb_generic_event_t *e){
+    return;
+}
+
+
+void win_add(xcb_window_t w){
+    return;
+}
+
+void win_center(const Arg arg){
+    return;
+}
+
+void win_del(xcb_window_t w , int del_cur){
+    return;
+}
+
+void win_focus(client *c){
+    return;
+}
+
+void win_fs(const Arg arg){
+    return;
+}
+
+void win_kill(const Arg arg){
+    return;
+}
+
+void win_next(const Arg arg){
+    return;
+}
+
+void win_prev(const Arg arg){
+    return;
+}
+
+void win_resize_h(const Arg arg){
+    return;
+}
+
+void win_resize_w(const Arg arg){
+    return;
+}
+
 
 /* Yoinked from c00kiemon5ter/monsterwm */
 /* wrapper to get xcb keycodes from keysymbol */
@@ -41,7 +118,7 @@ xcb_keycode_t* get_keycodes(xcb_keysym_t keysym) {
 }
 
 /* get numlock modifier using xcb */
-int setup_keyboard(void){
+int keyboard_setup(void){
 
     unsigned int modifiers[] = {
         0,
@@ -62,7 +139,7 @@ int setup_keyboard(void){
     modmap = xcb_get_modifier_mapping_keycodes(reply);
     if (!modmap) return 1;
 
-    numlock = xcb_get_keycodes(XK_Num_Lock);
+    numlock = get_keycodes(XK_Num_Lock);
     for (unsigned int i=0; i<8; i++)
        for (unsigned int j=0; j<reply->keycodes_per_modifier; j++) {
            xcb_keycode_t keycode = modmap[i * reply->keycodes_per_modifier + j];
@@ -91,7 +168,7 @@ int grab_input(void){
     xcb_ungrab_key(dpy, XCB_GRAB_ANY, scr->root, XCB_MOD_MASK_ANY);
     xcb_ungrab_button(dpy, XCB_BUTTON_INDEX_ANY, scr->root, XCB_GRAB_ANY);
 
-    if (!setup_keyboard()) return 1;
+    if (!get_keyboard_setup()) return 1;
 
     for (int i=0; i<LENGTH(keys); i++){
         keycode=get_keycodes(keys[i].keysym)

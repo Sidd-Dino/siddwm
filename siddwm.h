@@ -48,8 +48,8 @@ void win_to_ws(const Arg arg);
 
 void run(const Arg arg);
 
-xcb_keycode_t* xcb_get_keycodes(xcb_keysym_t keysym);
-int setup_keyboard(void);
+xcb_keycode_t* get_keycodes(xcb_keysym_t keysym);
+int keyboard_setup(void);
 int grab_input(void);
 
 static int xerror() { return 0; }
