@@ -3,10 +3,10 @@
 
 <p align="center">
 <a href="https://github.com/Sidd-Dino/siddwm/tree/xcb_ver">
-    <img src="https://i.imgur.com/2PTNAeo.png" height="50px" align="center"></a>
-
+    <img src="https://i.imgur.com/2PTNAeo.png" height="50px"></a>
+</br></br>
 <a href="https://github.com/Sidd-Dino/siddwm/tree/xlib_ver">
-    <img src="https://i.imgur.com/RyscKM1.png" height="50px" align="center"></a>
+    <img src="https://i.imgur.com/RyscKM1.png" height="50px"></a>
 </br></br></br>
 
 
