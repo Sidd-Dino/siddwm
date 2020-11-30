@@ -16,7 +16,6 @@ unsigned int numlockmask = 0;
 
 static void (*events[XCB_NO_OPERATION])(xcb_generic_event_t *e)  = {
         [XCB_BUTTON_PRESS]        = buttonpress,
-        [XCB_BUTTON_RELEASE]      = buttonrelease,
         [XCB_CONFIGURE_REQUEST]   = configurerequest,
         [XCB_KEY_PRESS]           = keypress,
         [XCB_MAP_REQUEST]         = maprequest,
@@ -26,80 +25,96 @@ static void (*events[XCB_NO_OPERATION])(xcb_generic_event_t *e)  = {
         [XCB_MOTION_NOTIFY]       = motionnotify,
 };
 
-void buttonpress(xcb_generic_event_t *e){
+void buttonpress(xcb_generic_event_t *e) {
+    xcb_button_press_event_t *ev = (xcb_button_press_event_t*)e;
+    if (!ev->child) return;
+
+    xcb_generic_error_t *err;
+    xcb_get_geometry_reply_t *geom = xcb_get_geometry_reply(dpy , xcb_get_geometry(dpy , ev->child) , &err);
+
+    if (!err) return ;
+
+    cur->wx = geom->x;
+    cur->wy = geom->y;
+    cur->ww = geom->width;
+    cur->wh = geom->height;
+    xcb_flush(dpy);
+}
+
+void configurerequest(xcb_generic_event_t *e) {
+    xcb_configure_request_event_t *ev = (xcb_configure_request_event_t*)e;
+
+    unsigned int v[7] = { ev->x, ev->y, ev->width, ev->height, 0, 0, 0 };
+    xcb_configure_window(dpy , ev->window, ev->value_mask , v );
+    xcb_flush(dpy);
+}
+
+void keypress(xcb_generic_event_t *e) {
+    xcb_key_press_event_t *ev       = (xcb_key_press_event_t *)e;
+    xcb_keysym_t          *keysym   = get_keycodes(ev->detail);
+    for (unsigned int i=0; i<LENGTH(keys); i++)
+        if (*keysym == keys[i].keysym && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func)
+                keys[i].function(keys[i].arg);
+}
+
+void maprequest(xcb_generic_event_t *e) {
     return;
 }
 
-void buttonrelease(xcb_generic_event_t *e){
+void mapnotify(xcb_generic_event_t *e) {
     return;
 }
 
-void configurerequest(xcb_generic_event_t *e){
+void destroynotify(xcb_generic_event_t *e) {
     return;
 }
 
-void keypress(xcb_generic_event_t *e){
+void enternotify(xcb_generic_event_t *e) {
     return;
 }
 
-void maprequest(xcb_generic_event_t *e){
-    return;
-}
-
-void mapnotify(xcb_generic_event_t *e){
-    return;
-}
-
-void destroynotify(xcb_generic_event_t *e){
-    return;
-}
-
-void enternotify(xcb_generic_event_t *e){
-    return;
-}
-
-void motionnotify(xcb_generic_event_t *e){
+void motionnotify(xcb_generic_event_t *e) {
     return;
 }
 
 
-void win_add(xcb_window_t w){
+void win_add(xcb_window_t w) {
     return;
 }
 
-void win_center(const Arg arg){
+void win_center(const Arg arg) {
     return;
 }
 
-void win_del(xcb_window_t w , int del_cur){
+void win_del(xcb_window_t w , int del_cur) {
     return;
 }
 
-void win_focus(client *c){
+void win_focus(client *c) {
     return;
 }
 
-void win_fs(const Arg arg){
+void win_fs(const Arg arg) {
     return;
 }
 
-void win_kill(const Arg arg){
+void win_kill(const Arg arg) {
     return;
 }
 
-void win_next(const Arg arg){
+void win_next(const Arg arg) {
     return;
 }
 
-void win_prev(const Arg arg){
+void win_prev(const Arg arg) {
     return;
 }
 
-void win_resize_h(const Arg arg){
+void win_resize_h(const Arg arg) {
     return;
 }
 
-void win_resize_w(const Arg arg){
+void win_resize_w(const Arg arg) {
     return;
 }
 
@@ -117,8 +132,8 @@ xcb_keycode_t* get_keycodes(xcb_keysym_t keysym) {
     return keycode;
 }
 
-/* get numlock modifier using xcb */
-int keyboard_setup(void){
+/* Yoinked from c00kiemon5ter/monsterwm */
+int keyboard_setup(void) {
 
     unsigned int modifiers[] = {
         0,
@@ -154,7 +169,7 @@ int keyboard_setup(void){
     return 0;
 }
 
-int grab_input(void){
+int grab_input(void) {
     xcb_flush(dpy);
 
     xcb_keycode_t *keycode;
@@ -168,10 +183,10 @@ int grab_input(void){
     xcb_ungrab_key(dpy, XCB_GRAB_ANY, scr->root, XCB_MOD_MASK_ANY);
     xcb_ungrab_button(dpy, XCB_BUTTON_INDEX_ANY, scr->root, XCB_GRAB_ANY);
 
-    if (!get_keyboard_setup()) return 1;
+    if (!keyboard_setup()) return 1;
 
     for (int i=0; i<LENGTH(keys); i++){
-        keycode=get_keycodes(keys[i].keysym)
+        keycode=get_keycodes(keys[i].keysym);
         for (unsigned int k=0; keycode[k] != XCB_NO_SYMBOL; k++)
             for (int m = 0; m < LENGTH(modifiers); m++)
                 xcb_grab_key(dpy, 1, scr->root,
