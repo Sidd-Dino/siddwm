@@ -35,6 +35,8 @@ static Display      *d;
 static XButtonEvent mouse;
 static Window       root;
 
+static int end_loop = 0;
+
 /* General Info
   XEvent union info : https://tronche.com/gui/x/xlib/events/structures.html
 */
@@ -130,7 +132,14 @@ void mapping_notify(XEvent *e) {
  * on receival, remove the appropriate client that held that window
  */
 void notify_destroy(XEvent *e) {
-    win_del(e->xdestroywindow.window , 1 );
+    int tmp = ws;
+
+    for (int i = 0; i<10; i++) {
+        ws_sel(i);
+        win_del(e->xdestroywindow.window , 1 );
+    }
+
+    ws_sel(tmp);
 
     if (list) win_focus(list->prev);
 }
@@ -193,7 +202,18 @@ void win_center(const Arg arg) {
     XMoveWindow(d, cur->w, (sw - cur->ww) / 2, (sh - cur->wh) / 2);
 }
 
-void win_del(Window w , int del_cur) {
+void win_close(const Arg arg) {
+    XEvent ev;
+    ev.type = ClientMessage;
+    ev.xclient.window = cur->w;
+    ev.xclient.message_type = XInternAtom(d, "WM_PROTOCOLS", 1);
+    ev.xclient.format = 32;
+    ev.xclient.data.l[0] = XInternAtom(d, "WM_DELETE_WINDOW", 0);
+    ev.xclient.data.l[1] = CurrentTime;
+    XSendEvent(d, cur->w, False, NoEventMask, &ev);
+}
+
+void win_del(Window w, int del_cur) {
     // del_cur is used if win_del is called by notify_destroy
     // to empty cur else it shouldnt empty cur
     client *x = 0;
@@ -344,6 +364,17 @@ void input_grab(Window root) {
 }
 
 
+void quit_siddwm(const Arg arg) {
+    for (int i = 0; i < 10; i++) {
+        ws_sel(ws);
+        while (list != NULL)
+            win_del( list->w , 1 );
+    }
+
+    XCloseDisplay(d);
+    end_loop = 1;
+}
+
 int main(void) {
     XEvent ev;
 
@@ -376,6 +407,6 @@ int main(void) {
     input_grab(root);
 
     // main loop
-    while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
+    while (!end_loop && !XNextEvent(d, &ev)) // 1 && will forever be here.
         if (events[ev.type]) events[ev.type](&ev);
 }

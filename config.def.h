@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #define MOD Mod4Mask
+
 const unsigned int MIN_WINDOW_SIZE    = 100;
 const unsigned int WINDOW_RESIZE_DIFF = 5;
 
@@ -20,22 +21,24 @@ const char* status[]    = {"status",                                0};
 const char* wallpaper[] = {"wllppr",                                0};
 
 static struct key keys[] = {
-        //modifier| Key   | Function  |Argumments
-        {MOD,      XK_q,   win_kill,   {0}},
-        {MOD,      XK_c,   win_center, {0}},
-        {MOD,      XK_f,   win_fs,     {0}},
+        {MOD|ShiftMask,      XK_e,      quit_siddwm,  {0}},
 
-        {Mod1Mask,           XK_Tab, win_next,   {0}},
-        {Mod1Mask|ShiftMask, XK_Tab, win_prev,   {0}},
+        {MOD,                XK_q,      win_close,  {0}},
+        {MOD|ShiftMask,      XK_q,      win_kill,   {0}},
+        {MOD,                XK_c,      win_center, {0}},
+        {MOD,                XK_f,      win_fs,     {0}},
 
-        {MOD, XK_d,                  run, {.com = menu}},
-        {MOD, XK_w,                  run, {.com = brwsr}},
-        {0  , XK_Print,              run, {.com = scrotpp}},
-        {MOD, XK_Print,              run, {.com = scrotppw}},
-        {MOD|ShiftMask, XK_Print,    run, {.com = scrotpps}},
-        {MOD, XK_Return,             run, {.com = term}},
-        {MOD, XK_s,                  run, {.com = status}},
-        {MOD|ShiftMask, XK_w,        run, {.com = wallpaper}},
+        {Mod1Mask,           XK_Tab,    win_next,   {0}},
+        {Mod1Mask|ShiftMask, XK_Tab,    win_prev,   {0}},
+
+        {MOD,                XK_d,      run, {.com = menu}},
+        {MOD,                XK_w,      run, {.com = brwsr}},
+        {0  ,                XK_Print,  run, {.com = scrotpp}},
+        {MOD,                XK_Print,  run, {.com = scrotppw}},
+        {MOD|ShiftMask,      XK_Print,  run, {.com = scrotpps}},
+        {MOD,                XK_Return, run, {.com = term}},
+        {MOD,                XK_s,      run, {.com = status}},
+        {MOD|ShiftMask,      XK_w,      run, {.com = wallpaper}},
 
         {0,   XF86XK_AudioLowerVolume,  run, {.com = voldown}},
         {0,   XF86XK_AudioRaiseVolume,  run, {.com = volup}},

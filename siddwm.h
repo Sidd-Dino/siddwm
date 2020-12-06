@@ -45,6 +45,7 @@ void notify_motion(XEvent *e);
 
 void win_add(Window w);
 void win_center(const Arg arg);
+void win_close(const Arg arg);
 void win_del(Window w , int del_cur);
 void win_focus(client *c);
 void win_fs(const Arg arg);
@@ -59,5 +60,7 @@ void win_to_ws(const Arg arg);
 
 void run(const Arg arg);
 void input_grab(Window root);
+
+void quit_siddwm(const Arg arg);
 
 static int xerror() { return 0; }
