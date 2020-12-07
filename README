@@ -54,7 +54,6 @@ ________________________________________________________________________________
     - `DESTDIR` and `PREFIX` are supported.
 - (Optional) Apply patch with `git apply patches/patch-name`
     - In case of applying multiple patches, it has to be done **manually**.
-
 - If you are using GDM, save the following to
   `/usr/share/xsessions/siddwm.desktop`.
   ________________________________________________________
