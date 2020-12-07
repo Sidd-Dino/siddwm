@@ -5,41 +5,16 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 #include "siddwm.h"
 #include "config.def.h"
 
-static client *list = {0}, *ws_list[WORKSPACES], *cur;
 static xcb_connection_t *dpy;
 static xcb_screen_t *scr;
 unsigned int numlockmask = 0;
-
-static void (*events[XCB_NO_OPERATION])(xcb_generic_event_t *e)  = {
-        [XCB_BUTTON_PRESS]        = buttonpress,
-        [XCB_CONFIGURE_REQUEST]   = configurerequest,
-        [XCB_KEY_PRESS]           = keypress,
-        [XCB_MAP_REQUEST]         = maprequest,
-        [XCB_MAPPING_NOTIFY]      = mapnotify,
-        [XCB_DESTROY_NOTIFY]      = destroynotify,
-        [XCB_ENTER_NOTIFY]        = enternotify,
-        [XCB_MOTION_NOTIFY]       = motionnotify,
-};
-
-void buttonpress(xcb_generic_event_t *e) {
-    xcb_button_press_event_t *ev = (xcb_button_press_event_t*)e;
-    if (!ev->child) return;
-
-    xcb_generic_error_t *err;
-    xcb_get_geometry_reply_t *geom = xcb_get_geometry_reply(dpy , xcb_get_geometry(dpy , ev->child) , &err);
-
-    if (!err) return ;
-
-    cur->wx = geom->x;
-    cur->wy = geom->y;
-    cur->ww = geom->width;
-    cur->wh = geom->height;
-    xcb_flush(dpy);
-}
+FILE *fp;
 
 void configurerequest(xcb_generic_event_t *e) {
     xcb_configure_request_event_t *ev = (xcb_configure_request_event_t*)e;
@@ -49,11 +24,23 @@ void configurerequest(xcb_generic_event_t *e) {
     xcb_flush(dpy);
 }
 
+/* wrapper to get xcb keysymbol from keycode */
+static xcb_keysym_t xcb_get_keysym(xcb_keycode_t keycode) {
+    xcb_key_symbols_t *keysyms;
+    xcb_keysym_t       keysym;
+
+    if (!(keysyms = xcb_key_symbols_alloc(dpy))) return 0;
+    keysym = xcb_key_symbols_get_keysym(keysyms, keycode, 0);
+    xcb_key_symbols_free(keysyms);
+
+    return keysym;
+}
+
 void keypress(xcb_generic_event_t *e) {
     xcb_key_press_event_t *ev       = (xcb_key_press_event_t *)e;
-    xcb_keysym_t          *keysym   = get_keycodes(ev->detail);
+    xcb_keysym_t           keysym   = xcb_get_keysym(ev->detail);
     for (unsigned int i=0; i<LENGTH(keys); i++)
-        if (*keysym == keys[i].keysym && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func)
+        if (keysym == keys[i].keysym && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].function)
                 keys[i].function(keys[i].arg);
 }
 
@@ -83,6 +70,9 @@ void win_add(xcb_window_t w) {
 }
 
 void win_center(const Arg arg) {
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_center\n");
+    fclose(fp);
     return;
 }
 
@@ -95,18 +85,30 @@ void win_focus(client *c) {
 }
 
 void win_fs(const Arg arg) {
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_fs\n");
+    fclose(fp);
     return;
 }
 
 void win_kill(const Arg arg) {
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_kill\n");
+    fclose(fp);
     return;
 }
 
 void win_next(const Arg arg) {
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_next\n");
+    fclose(fp);
     return;
 }
 
 void win_prev(const Arg arg) {
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_prev\n");
+    fclose(fp);
     return;
 }
 
@@ -117,6 +119,21 @@ void win_resize_h(const Arg arg) {
 void win_resize_w(const Arg arg) {
     return;
 }
+
+void ws_go(const Arg arg){
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "ws_go %d\n", arg.i);
+    fclose(fp);
+    return;
+}
+
+void win_to_ws(const Arg arg){
+    fp = fopen("/tmp/siddwm_debug.txt", "w+");
+    fprintf(fp, "win_to_ws %d\n", arg.i);
+    fclose(fp);
+    return;
+}
+
 
 
 /* Yoinked from c00kiemon5ter/monsterwm */
@@ -134,13 +151,6 @@ xcb_keycode_t* get_keycodes(xcb_keysym_t keysym) {
 
 /* Yoinked from c00kiemon5ter/monsterwm */
 int keyboard_setup(void) {
-
-    unsigned int modifiers[] = {
-        0,
-        XCB_MOD_MASK_LOCK,
-        numlockmask,
-        numlockmask | XCB_MOD_MASK_LOCK
-    };
 
     xcb_get_modifier_mapping_reply_t *reply;
     xcb_keycode_t                    *modmap;
@@ -172,6 +182,8 @@ int keyboard_setup(void) {
 int grab_input(void) {
     xcb_flush(dpy);
 
+    unsigned int i, k, m;
+
     xcb_keycode_t *keycode;
     unsigned int modifiers[] = {
 		0,
@@ -185,10 +197,10 @@ int grab_input(void) {
 
     if (!keyboard_setup()) return 1;
 
-    for (int i=0; i<LENGTH(keys); i++){
+    for (i=0; i<LENGTH(keys); i++){
         keycode=get_keycodes(keys[i].keysym);
-        for (unsigned int k=0; keycode[k] != XCB_NO_SYMBOL; k++)
-            for (int m = 0; m < LENGTH(modifiers); m++)
+        for (k=0; keycode[k] != XCB_NO_SYMBOL; k++)
+            for (m = 0; m < LENGTH(modifiers); m++)
                 xcb_grab_key(dpy, 1, scr->root,
                     keys[i].mod | modifiers[m],
                     keycode[k],
@@ -197,8 +209,8 @@ int grab_input(void) {
     }
 
 
-    for (int i=1; i<4; i++)
-        for (unsigned int m=0; m<LENGTH(modifiers); m++)
+    for (i=1; i<4; i++)
+        for (m=0; m<LENGTH(modifiers); m++)
             xcb_grab_button(dpy, 1, scr->root,
                 XCB_EVENT_MASK_BUTTON_PRESS |
                 XCB_EVENT_MASK_BUTTON_RELEASE|
@@ -207,6 +219,8 @@ int grab_input(void) {
                 scr->root, XCB_NONE, i, MOD|modifiers[m]);
 
     xcb_flush(dpy);
+
+    return 0;
 }
 
 int main() {
@@ -223,8 +237,26 @@ int main() {
         return 1;
     }
 
-    if (!grab_input()) {
+    if (grab_input()) {
         xcb_disconnect(dpy);
         return 1;
+    }
+
+
+    xcb_generic_event_t *ev;
+    while ( (ev = xcb_wait_for_event (dpy)) ) {
+        switch (ev->response_type & ~0x80) {
+            case XCB_KEY_PRESS: {
+                keypress(ev);
+                break;
+            }
+            default:
+                /* Unknown event type, ignore it */
+                fp = fopen("/tmp/siddwm_debug.txt", "w+");
+                fprintf (fp, "Unknown event: %"PRIu8"\n", ev->response_type);
+                fclose(fp);
+                break;
+            }
+        free(ev);
     }
 }

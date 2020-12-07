@@ -51,5 +51,3 @@ void run(const Arg arg);
 xcb_keycode_t* get_keycodes(xcb_keysym_t keysym);
 int keyboard_setup(void);
 int grab_input(void);
-
-static int xerror() { return 0; }
