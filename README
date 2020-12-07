@@ -65,4 +65,4 @@ ________________________________________________________________________________
   | Type=Application                                     |
   --------------------------------------------------------
 
- *It is still recommended to start `siddwm` from `.xinitrc` or through
+ *It is still recommended to start `siddwm` from `.xinitrc`
