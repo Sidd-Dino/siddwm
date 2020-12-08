@@ -3,7 +3,7 @@
 
 #define MOD Mod4Mask
 
-const unsigned int MIN_WINDOW_SIZE    = 100;
+const unsigned int MIN_WINDOW_SIZE    = 150;
 const unsigned int WINDOW_RESIZE_DIFF = 5;
 
 const char* menu[]      = {"rofi", "-show", "drun",     0};

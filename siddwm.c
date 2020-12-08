@@ -166,8 +166,8 @@ void notify_motion(XEvent *e) {
     XMoveResizeWindow(d, mouse.subwindow,
         cur->wx + (mouse.button == 1 ? xd : 0),
         cur->wy + (mouse.button == 1 ? yd : 0),
-        MAX(1, cur->ww + (mouse.button == 3 ? xd : 0)),
-        MAX(1, cur->wh + (mouse.button == 3 ? yd : 0)));
+        MAX(MIN_WINDOW_SIZE, cur->ww + (mouse.button == 3 ? xd : 0)),
+        MAX(MIN_WINDOW_SIZE, cur->wh + (mouse.button == 3 ? yd : 0)));
 }
 
 
