@@ -1,0 +1,48 @@
+SIDDWM                                        siddwm is dumb dumb window manager
+________________________________________________________________________________
+
+SIDDWM is a fork of sowm
+The XLib version has a few fixes and new features.
+The Xcb version is still a work in progress.
+
+*Checkout the pull requests for the different versions
+
+
+COMMON FEATURE
+________________________________________________________________________________
+
+- Floating only.
+- Fullscreen toggle.
+- Window centering.
+- Mix of mouse and keyboard workflow.
+- Focus with cursor .
+- Alt-Tab window focusing.
+- All windows die on exit.
+- No window borders.
+- No ICCCM
+- No EWMH.
+- etc etc etc
+
+
+SCREENSHOTS
+________________________________________________________________________________
+
+[*] i.imgur.com/VpSvaV6.png
+[*] i.imgur.com/oYxvIXp.png
+
+
+THANKS
+________________________________________________________________________________
+
+   2bwm   -> github.com/venam/2bwm
+  berry   -> github.com/JLErvin/berry
+  catwm   -> github.com/pyknite/catwm
+ dminiwm  -> github.com/moetunes/dminiwm
+   dwm    -> dwm.suckless.org
+monsterwm -> github.com/c00kiemon5ter/monsterwm
+ openbox  -> github.com/danakj/openbox
+possum-wm -> github.com/duckinator/possum-wm
+ SmallWM  -> github.com/adamnew123456/SmallWM
+   sowm   -> github.com/dylanaraps/sowm
+   swm    -> github.com/dcat/swm
+  tinywm  -> incise.org/tinywm.html
