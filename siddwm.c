@@ -203,6 +203,8 @@ void win_center(const Arg arg) {
 }
 
 void win_close(const Arg arg) {
+    if (!cur) return;
+    
     XEvent ev;
     ev.type = ClientMessage;
     ev.xclient.window = cur->w;
