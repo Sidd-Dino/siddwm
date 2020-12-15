@@ -7,7 +7,7 @@ const unsigned int MIN_WINDOW_SIZE    = 150;
 const unsigned int WINDOW_RESIZE_DIFF = 5;
 
 const char* menu[]      = {"rofi", "-show", "drun",     0};
-const char* term[]      = {"kitty",                     0};
+const char* term[]      = {"urxvt",                     0};
 const char* brwsr[]     = {"firefox", "--new-tab",      0};
 const char* scrotpp[]   = {"scrot++",                   0};
 const char* scrotppw[]  = {"scrot++", "-w",             0};
