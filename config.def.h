@@ -7,7 +7,7 @@ const unsigned int MIN_WINDOW_SIZE    = 150;
 const unsigned int WINDOW_RESIZE_DIFF = 5;
 
 const char* menu[]      = {"rofi", "-show", "drun",     0};
-const char* term[]      = {"urxvt",                     0};
+const char* term[]      = {"urxvtc",                    0};
 const char* brwsr[]     = {"firefox", "--new-tab",      0};
 const char* scrotpp[]   = {"scrot++",                   0};
 const char* scrotppw[]  = {"scrot++", "-w",             0};
@@ -18,7 +18,7 @@ const char* voldown[]   = {"amixer", "sset", "Master", "2%-",       0};
 const char* volup[]     = {"amixer", "sset", "Master", "2%+",       0};
 const char* volmute[]   = {"amixer", "sset", "Master", "toggle",    0};
 const char* status[]    = {"status",                                0};
-const char* wallpaper[] = {"wllppr",                                0};
+const char* wallpaper[] = {"wllppr_ping",               0};
 
 static struct key keys[] = {
         {MOD|ShiftMask,      XK_e,      quit_siddwm,  {0}},
